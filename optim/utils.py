@@ -66,7 +66,7 @@ def load_exp(exp_name):
 
 
 def create_exp(name, dataset, net, n_workers, epochs, seed, batch_size, lrs, compression, error_feedback, criterion,
-               master_compression=None, momentum=0, weight_decay=0):
+               master_compression=None, momentum=0, weight_decay=0, val_ratio=0.1, common_ratio=0.0):
     exp = {
         'name': name,
         'dataset_name': dataset,
@@ -82,7 +82,9 @@ def create_exp(name, dataset, net, n_workers, epochs, seed, batch_size, lrs, com
         'error_feedback': error_feedback,
         'criterion': criterion,
         'momentum': momentum,
-        'weight_decay': weight_decay
+        'weight_decay': weight_decay,
+        'val_ratio': val_ratio,
+        'common_ratio': common_ratio
             }
     return exp
 

@@ -4,7 +4,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Subset
 
 
-def create_loaders(dataset_name, n_workers, batch_size, seed=42):
+def create_loaders(dataset_name, n_workers, batch_size, seed=42, val_ratio=0.1, common_ratio=0.0):
 
     train_data, test_data = load_data(dataset_name)
 
@@ -16,11 +16,14 @@ def create_loaders(dataset_name, n_workers, batch_size, seed=42):
     indices = np.arange(n)
     np.random.shuffle(indices)
     
-    VAL_RATIO = 0.1
+    VAL_RATIO = val_ratio
     n_val = np.int(np.floor(VAL_RATIO * n))
     val_data = Subset(train_data, indices=indices[:n_val])
-
-    indices = indices[n_val:]
+    
+    COMMON_RATIO = common_ratio
+    n_common = np.int(np.floor((COMMON_RATIO * (1 - VAL_RATIO) + VAL_RATIO) * n))
+    indices_common = indices[n_val:n_common]
+    indices = indices[n_common:]
     n = len(indices)
     a = np.int(np.floor(n / n_workers)) 
     top_ind = a * n_workers
@@ -31,7 +34,7 @@ def create_loaders(dataset_name, n_workers, batch_size, seed=42):
 
     b = 0
     for ind in split:
-        train_loader_workers[b] = DataLoader(Subset(train_data, ind), batch_size=batch_size, shuffle=True)
+        train_loader_workers[b] = DataLoader(Subset(train_data, np.concatenate((indices_common, ind))), batch_size=batch_size, shuffle=True)
         b = b + 1
 
     test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
