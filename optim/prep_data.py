@@ -15,16 +15,19 @@ def create_loaders(dataset_name, n_workers, batch_size, seed=42):
     np.random.seed(seed)
     indices = np.arange(n)
     np.random.shuffle(indices)
-
-    n_val = np.int(np.floor(0.1 * n))
+    
+    VAL_RATIO = 0.1
+    n_val = np.int(np.floor(VAL_RATIO * n))
     val_data = Subset(train_data, indices=indices[:n_val])
 
     indices = indices[n_val:]
     n = len(indices)
-    a = np.int(np.floor(n / n_workers))
+    a = np.int(np.floor(n / n_workers)) 
     top_ind = a * n_workers
+    
     seq = range(a, top_ind, a)
     split = np.split(indices[:top_ind], seq)
+    
 
     b = 0
     for ind in split:

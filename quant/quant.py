@@ -56,7 +56,7 @@ def random_dithering_wrap(p=np.inf, s=2, natural=True):
     return random_dithering
 
 
-def rand_spars_opt(x, h):
+def rand_spars_opt(x, h, w_id):
     """
     :param x: vector to sparsify
     :param h: density
@@ -75,12 +75,12 @@ def rand_spars_opt(x, h):
 
 
 def rand_spars_wrap(h=0.1):
-    def rand_spars(x):
-        return rand_spars_opt(x, h=h)
+    def rand_spars(x, w_id):
+        return rand_spars_opt(x, h=h, w_id=w_id)
     return rand_spars
 
 
-def top_k_opt(x, h):
+def top_k_opt(x, h, w_id):
     """
     :param x: vector to sparsify
     :param h: density
@@ -99,8 +99,8 @@ def top_k_opt(x, h):
 
 
 def top_k_wrap(h=0.1):
-    def top_k(x):
-        return top_k_opt(x, h=h)
+    def top_k(x, w_id):
+        return top_k_opt(x, h=h, w_id=w_id)
     return top_k
 
 

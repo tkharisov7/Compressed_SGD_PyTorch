@@ -1,6 +1,4 @@
-import torch
 from torch.optim.optimizer import Optimizer
-
 
 class SGDGen(Optimizer):
     r"""
@@ -41,7 +39,6 @@ class SGDGen(Optimizer):
     @torch.no_grad()
     def step_local_global(self, w_id, closure=None):
         """Performs a single optimization step.
-
         Arguments:
             w_id: integer, id of the worker
             closure (callable, optional): A closure that reevaluates the model
@@ -74,12 +71,12 @@ class SGDGen(Optimizer):
                     else:
                         loc_grad = d_p.mul(group['lr']) + param_state[error_name]
 
-                    d_p = self.comp(loc_grad)
+                    d_p = self.comp(loc_grad, w_id)
                     param_state[error_name] = loc_grad - d_p
 
                 else:
                     if self.comp is not None:
-                        d_p = self.comp(d_p).mul(group['lr'])
+                        d_p = self.comp(d_p, w_id).mul(group['lr'])
                     else:
                         d_p = d_p.mul(group['lr'])
 

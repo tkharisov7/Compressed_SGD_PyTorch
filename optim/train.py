@@ -1,11 +1,8 @@
 import torch
 import numpy as np
+from tqdm import tqdm
 
-from .utils import create_run, update_run, save_run, seed_everything
-from .prep_data import create_loaders
-from .gen_sgd import SGDGen
-
-RUNS = 5
+RUNS = 1
 
 
 def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_workers,
@@ -24,7 +21,7 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
         running_loss = 0
         train_loader_iter = [iter(train_loader_workers[w]) for w in range(n_workers)]
         iter_steps = len(train_loader_workers[0])
-        for _ in range(iter_steps):
+        for _ in tqdm(range(iter_steps)):
             for w_id in range(n_workers):
                 data, labels = next(train_loader_iter[w_id])
                 data, labels = data.to(device), labels.to(device)

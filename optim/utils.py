@@ -5,8 +5,8 @@ import random
 import torch
 from pickle import load, dump
 
-SAVED_RUNS_PATH = 'saved_data/'
-EXP_PATH = 'exps_setup/'
+SAVED_RUNS_PATH = '/kaggle/working/saved_data/'
+EXP_PATH = '/kaggle/working/exps_setup/'
 
 
 def save_run(suffix, run):
