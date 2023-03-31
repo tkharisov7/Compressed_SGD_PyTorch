@@ -175,7 +175,7 @@ class PermK_TopK_unbiased:
         index_start = (d / self.nodes_count) * node_index
         index_end = (d / self.nodes_count) * (node_index + 1)
         indices = self.permutation[self.count[node_index]][int(index_start): int(index_end)]
-        indices = torch.tensor(indices, dtype=torch.long)
+        indices = indices.clone().detach().requires_grad_(True)
         mask = torch.zeros_like(x)
         mask[indices] = 1
         return_grad = mask * x * self.nodes_count
@@ -203,7 +203,7 @@ class PermK_TopK_biased:
         index_start = (d / self.nodes_count) * node_index
         index_end = (d / self.nodes_count) * (node_index + 1)
         indices = self.permutation[self.count[node_index]][int(index_start): int(index_end)]
-        indices = torch.tensor(indices, dtype=torch.long)
+        indices = indices.clone().detach().requires_grad_(True)
         mask = torch.zeros_like(x)
         mask[indices] = 1
         return_grad = mask * x # * self.nodes_count
