@@ -1,5 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from optim.utils import read_all_runs
 import numpy as np
 import os
 
