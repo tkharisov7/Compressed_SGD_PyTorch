@@ -12,7 +12,7 @@ mpl.rcParams['xtick.labelsize'] = 'x-large'
 mpl.rcParams['ytick.labelsize'] = 'x-large'
 mpl.rcParams['axes.labelsize'] = 'x-large'
 
-PLOT_PATH = 'plots/'
+PLOT_PATH = '/kaggle/working/exps_setup/plots/'
 
 
 def plot(exps, kind, suffix=None, log_scale=True, legend=None, file=None,
