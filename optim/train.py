@@ -109,7 +109,9 @@ def run_workers(lr, exp, suffix=None, hpo=False):
     net = exp['net']
     model = net()
 
-    train_loader_workers, val_loader, test_loader = create_loaders(dataset_name, n_workers, batch_size, exp['val_ratio'], exp['common_ratio'])
+    train_loader_workers, val_loader, test_loader = create_loaders(dataset_name, n_workers, batch_size, 
+                                                                   seed=exp['seed'], val_ratio=exp['val_ratio'], 
+                                                                   common_ratio=exp['common_ratio'])
 
     optimizer = SGDGen(model.parameters(), lr=lr, n_workers=n_workers, error_feedback=error_feedback,
                        comp=compression, momentum=momentum, weight_decay=weight_decay, master_comp=master_compression)
