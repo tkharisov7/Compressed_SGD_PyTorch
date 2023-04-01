@@ -43,10 +43,12 @@ def create_run():
     return run
 
 
-def update_run(train_loss, test_loss, test_acc, run):
+def update_run(train_loss, test_loss, test_acc, run, compressed_loss=None):
     run['train_loss'].append(train_loss)
     run['test_loss'].append(test_loss)
     run['test_acc'].append(test_acc)
+    if compressed_loss is not None:
+        run['compressed_loss'] = compressed_loss
 
 
 def save_exp(exp):
