@@ -262,9 +262,18 @@ class Quadratic(nn.Module):
     """
     Quadtatic optimization problem
     """
-    def __init__(self, x, d):
+    def __init__(self, d):
         self.x = torch.zeros(d)
         self.x[0] = torch.sqrt(d)
 
-    def forward(self, x, A, b):
-        return 1/2 * (self.x).T @ A @ x - b.T @ (self.x)
+    def forward(self, A_b):
+        A = A_b[:, :-1]
+        b = A_b[:, -1]
+        return 1/2 * (self.x).T @ A @ self.x - b.T @ (self.x)
+
+def quadratic_model(d):
+    """
+    Simple quadratic optimisation problem
+    f(x) = 1/2 x^T A x - b^T x
+    """
+    return Quadratic(d)

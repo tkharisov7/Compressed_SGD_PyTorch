@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, Subset
 
 def create_loaders(dataset_name, n_workers, batch_size, seed=42, val_ratio=0.1, common_ratio=0.0):
 
-    train_data, test_data = load_data(dataset_name)
+    train_data, test_data = load_data(dataset_name, n_workers)
 
     train_loader_workers = dict()
     n = len(train_data)
@@ -43,7 +43,7 @@ def create_loaders(dataset_name, n_workers, batch_size, seed=42, val_ratio=0.1, 
     return train_loader_workers, val_loader, test_loader
 
 
-def load_data(dataset_name):
+def load_data(dataset_name, n_workers=None):
 
     if dataset_name == 'mnist':
 
@@ -76,9 +76,12 @@ def load_data(dataset_name):
         test_data = datasets.CIFAR100(root='data', train=False,
                                       download=True, transform=transform)
         
-    elif dataset_name == 'quadratic':
-        train_data
-
+    elif dataset_name[:9] == 'quadratic':
+        strs = dataset_name.split('_')
+        d = int(strs[1])
+        noise_scale = float(strs[2])
+        regularizer = float(strs[3])
+        train_data = gen_similar_list_article(n_workers, d, noise_scale, regularizer)
     else:
         raise ValueError(dataset_name + ' is not known.')
 
@@ -115,5 +118,8 @@ def gen_similar_list_article (nodes_count, d, noise_scale, regularizer):
     x_0 = torch.zeros(d)
     x_0[0] = math.sqrt(d)
 
-    return torch.tensor(A_list_similar), torch.tensor(b_list)
-# [n, d, d], [n, d, 1]
+    A_l = torch.tensor(A_list_similar)
+    b_l = torch.tensor(b_list)
+    concat_res = torch.cat((A_l, b_l.unsqueeze(-1)), dim=-1)
+    # [n, d, d+1]
+    return concat_res
