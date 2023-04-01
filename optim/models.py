@@ -257,3 +257,14 @@ def vgg19():
 def vgg19_bn():
     """VGG 19-layer model (configuration 'E') with batch normalization"""
     return VGG(make_layers(cfg['E'], batch_norm=True))
+
+class Quadratic(nn.Module):
+    """
+    Quadtatic optimization problem
+    """
+    def __init__(self, x, d):
+        self.x = torch.zeros(d)
+        self.x[0] = torch.sqrt(d)
+
+    def forward(self, x, A, b):
+        return 1/2 * (self.x).T @ A @ x - b.T @ (self.x)
