@@ -75,7 +75,45 @@ def load_data(dataset_name):
 
         test_data = datasets.CIFAR100(root='data', train=False,
                                       download=True, transform=transform)
+        
+    elif dataset_name == 'quadratic':
+        train_data
+
     else:
         raise ValueError(dataset_name + ' is not known.')
 
     return train_data, test_data
+
+def gen_similar_list_article (nodes_count, d, noise_scale, regularizer):
+    ksi_s, ksi_b = torch.from_numpy(np.random.normal(0, 1, size=nodes_count)), torch.from_numpy(np.random.normal(0, 1, size=nodes_count))
+    nu_s, nu_b = torch.ones(nodes_count) + noise_scale*ksi_s, noise_scale*ksi_b
+
+    b_list = []
+    for i in range(nodes_count):
+        mult = torch.zeros(d)
+        mult[0] = -1 + nu_b[i]
+        b_i = nu_s[i]/4*mult
+        b_list.append(b_i)
+
+    #tridiagonal matrix
+    k = [torch.ones(d-1),-2*torch.ones(d),torch.ones(d-1)]
+    offset = [-1,0,1]
+    A_tri = -1*(torch.from_numpy(diags(k,offset).toarray()))
+
+    A_list_similar = []
+    A = torch.zeros((d, d))
+    for i in range(nodes_count):
+        A_list_similar.append(nu_s[i] / 4 * A_tri)
+        A += A_list_similar[i]
+
+    A = A/nodes_count
+    lambda_min = torch.min(torch.abs(torch.linalg.eigvals(A)))
+
+    for i in range(nodes_count):
+        A_list_similar[i] += (regularizer - lambda_min)*torch.eye(d)
+
+    x_0 = torch.zeros(d)
+    x_0[0] = math.sqrt(d)
+
+    return torch.tensor(A_list_similar), torch.tensor(b_list)
+# [n, d, d], [n, d, 1]
