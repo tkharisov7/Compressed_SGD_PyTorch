@@ -103,6 +103,13 @@ def top_k_wrap(h=0.1):
         return top_k_opt(x, h=h, w_id=w_id)
     return top_k
 
+class TopK:
+    def __init__(self, h=0.1):
+        self.h = h
+
+    def __call__(self, x, w_id):
+        return top_k_opt(x, h=self.h, w_id=w_id)
+
 
 def grad_spars_opt(x, h, max_it):
     """

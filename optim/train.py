@@ -49,7 +49,7 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
             test_loss = 0
             test_acc = 0
 
-        update_run(train_loss, test_loss, test_acc, run)
+        update_run(train_loss, test_loss, test_acc, run, optimizer.overall_information)
 
         print("\nEpoch: {}/{}.. Training Loss: {:.5f}, Test Loss: {:.5f}, Test accuracy: {:.2f} "
               .format(e + 1, epochs, train_loss, test_loss, test_acc), end='\r')

@@ -31,6 +31,7 @@ class SGDGen(Optimizer):
 
         self.n_workers = n_workers
         self.grads_received = 0
+        self.overall_information = 0  # in bytes
 
     def __setstate__(self, state):
         super(SGDGen, self).__setstate__(state)
@@ -73,11 +74,13 @@ class SGDGen(Optimizer):
                         loc_grad = d_p.mul(group['lr']) + param_state[error_name]
 
                     d_p = self.comp(loc_grad, w_id)
-                    param_state[error_name] = loc_grad - d_p
-
+                    self.overall_information += d_p.element_size() * d_p.nelement() * self.comp.h
+                    # print(d_p)
+                    # param_state[error_name] = loc_grad - d_p
                 else:
                     if self.comp is not None:
                         d_p = self.comp(d_p, w_id).mul(group['lr'])
+                        self.overall_information += d_p.element_size() * d_p.nelement() * self.comp.h
                     else:
                         d_p = d_p.mul(group['lr'])
 

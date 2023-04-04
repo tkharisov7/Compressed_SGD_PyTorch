@@ -43,15 +43,17 @@ def read_run(file):
 def create_run():
     run = {'train_loss': [],
            'test_loss': [],
-           'test_acc': []
+           'test_acc': [], 
+           'information': [],
            }
     return run
 
 
-def update_run(train_loss, test_loss, test_acc, run):
+def update_run(train_loss, test_loss, test_acc, run, information):
     run['train_loss'].append(train_loss)
     run['test_loss'].append(test_loss)
     run['test_acc'].append(test_acc)
+    run['information'].append(information)
 
 
 def save_exp(exp):

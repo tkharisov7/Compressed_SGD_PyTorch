@@ -21,12 +21,15 @@ def change_plot_path(name):
 
 
 def plot(exps, kind, suffix=None, log_scale=True, legend=None, file=None,
-         x_label='epochs', y_label=None, title=None):
+         x_label='epochs', y_label=None, title=None, plot_info=False):
     fig, ax = plt.subplots()
 
     for exp, lab in zip(exps, legend):
         runs = read_all_runs(exp, suffix=suffix)
-        plot_mean_std(ax, runs, kind, lab)
+        if not plot_info:
+            plot_mean_std(ax, runs, kind, lab)
+        else:
+            plot_information(ax, runs, kind, lab)
 
     if log_scale:
         ax.set_yscale('log')
@@ -58,3 +61,11 @@ def plot_mean_std(ax, runs, kind, lab):
     x = np.arange(1, len(mean) + 1)
     ax.plot(x, mean, label=lab)
     #ax.fill_between(x, mean + std, mean - std, alpha=0.4)
+
+def plot_information(ax, runs, kind, lab):
+    quant = np.array([run[kind] for run in runs])
+    mean = np.mean(quant, axis=0)
+    std = np.std(quant, axis=0)
+    mean = np.array([mean]) if not isinstance(mean, np.ndarray) else mean
+    x = np.array(runs[0]['information'])
+    ax.plot(x, mean, label=lab)
