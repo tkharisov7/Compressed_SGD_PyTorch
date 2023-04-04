@@ -281,7 +281,7 @@ class Quadratic(nn.Module):
         #return torch.tensor(float(result)).requires_grad_(True)
         return result.reshape([1])
 
-def quadratic_model(d=100):
+def quadratic_model(d=1000):
     """
     Simple quadratic optimisation problem
     f(x) = 1/2 x^T A x - b^T x
