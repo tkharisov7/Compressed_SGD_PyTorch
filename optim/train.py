@@ -17,6 +17,7 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
     train_loss = np.inf
 
     best_val_loss = np.inf
+    best_train_loss = np.inf
     test_loss = np.inf
     test_acc = 0
 
@@ -25,7 +26,7 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
         running_loss = 0
         train_loader_iter = [iter(train_loader_workers[w]) for w in range(n_workers)]
         iter_steps = len(train_loader_workers[0])
-        if e % log_every == 0:
+        if (e + 1) % log_every == 0:
             gen = tqdm(range(iter_steps))
         else:
             gen = range(iter_steps)
@@ -52,10 +53,12 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
             val_loss = 0
             test_loss = 0
             test_acc = 0
+            if train_loss < best_train_loss:
+                best_train_loss = train_loss
 
         update_run(train_loss, test_loss, test_acc, run, optimizer.overall_information)
 
-        if e % log_every == 0:
+        if (e + 1) % log_every == 0:
             print("\nEpoch: {}/{}.. Training Loss: {:.5f}, Test Loss: {:.5f}, Test accuracy: {:.2f} "
                 .format(e + 1, epochs, train_loss, test_loss, test_acc), end='\r')
 
@@ -63,7 +66,10 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
     if not hpo:
         save_run(suffix, run)
 
-    return best_val_loss
+    if best_val_loss == np.inf:
+        return best_train_loss
+    else:
+        return best_val_loss
 
 
 def accuracy_and_loss(model, loader, criterion, device):
