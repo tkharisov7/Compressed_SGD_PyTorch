@@ -8,19 +8,20 @@ from .gen_sgd import SGDGen
 
 RUNS = 1
 
+COUNT_THRESHOLD = 5
 
 def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_workers,
-                  val_loader, test_loader, n_workers, hpo=False, log_every=1):
+                  val_loader, test_loader, n_workers, hpo=False, log_every=1, threshold=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     run = create_run()
     train_loss = np.inf
 
     best_val_loss = np.inf
-    best_train_loss = np.inf
+    best_train_count = np.inf
     test_loss = np.inf
     test_acc = 0
-
+    count_less_than_threshold = 0
     for e in range(epochs):
         model.train()
         running_loss = 0
@@ -49,12 +50,17 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
             if val_loss < best_val_loss:
                 test_loss, test_acc = accuracy_and_loss(model, test_loader, criterion, device)
                 best_val_loss = val_loss
-        else:
+        elif threshold is not None and best_train_count == np.inf:
             val_loss = 0
             test_loss = 0
             test_acc = 0
-            if train_loss < best_train_loss:
-                best_train_loss = train_loss
+            if train_loss < threshold:
+                count_less_than_threshold += 1
+            else:
+                count_less_than_threshold = 0
+            if count_less_than_threshold == COUNT_THRESHOLD:
+                best_train_count = e + 1
+
 
         update_run(train_loss, test_loss, test_acc, run, optimizer.overall_information)
 
@@ -67,7 +73,7 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
         save_run(suffix, run)
 
     if best_val_loss == np.inf:
-        return best_train_loss
+        return best_train_count
     else:
         return best_val_loss
 
@@ -122,6 +128,7 @@ def run_workers(lr, exp, suffix=None, hpo=False):
     compression = get_compression(**exp['compression'])
     master_compression = exp['master_compression']
     log_every = exp['log_every']
+    threshold = exp['threshold']
 
     net = exp['net']
     model = net()
@@ -134,7 +141,8 @@ def run_workers(lr, exp, suffix=None, hpo=False):
                        comp=compression, momentum=momentum, weight_decay=weight_decay, master_comp=master_compression)
 
     val_loss = train_workers(suffix, model, optimizer, criterion, epochs, train_loader_workers,
-                             val_loader, test_loader, n_workers, hpo=hpo, log_every=log_every)
+                             val_loader, test_loader, n_workers, hpo=hpo, log_every=log_every, 
+                             threshold=threshold)
     return val_loss
 
 
