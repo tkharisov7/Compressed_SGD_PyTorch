@@ -88,6 +88,7 @@ def load_data(dataset_name, n_workers=None):
         noise_scale = float(strs[2])
         regularizer = float(strs[3])
         train_data = zip(gen_similar_list_article(n_workers, d, noise_scale, regularizer), [torch.tensor(0) for _ in range(n_workers)])
+        # train_data = zip(gen_random_list(n_workers, d), [torch.tensor(0) for _ in range(n_workers)])
         train_data = list(train_data)
         test_data = torch.zeros(1, d, d+1)
     else:
@@ -95,7 +96,7 @@ def load_data(dataset_name, n_workers=None):
 
     return train_data, test_data
 
-def gen_similar_list_article (nodes_count, d, noise_scale, regularizer):
+def gen_similar_list_article(nodes_count, d, noise_scale, regularizer):
     ksi_s, ksi_b = torch.from_numpy(np.random.normal(0, 1, size=nodes_count)), torch.from_numpy(np.random.normal(0, 1, size=nodes_count))
     nu_s, nu_b = torch.ones(nodes_count) + noise_scale*ksi_s, noise_scale*ksi_b
 
@@ -126,9 +127,21 @@ def gen_similar_list_article (nodes_count, d, noise_scale, regularizer):
     x_0 = torch.zeros(d)
     x_0[0] = math.sqrt(d)
 
-    # A_l = torch.stack(A_list_similar)
-    # b_l = torch.stack(b_list)
-    # concat_res = torch.cat((A_l, b_l.unsqueeze(-1)), dim=-1)
-    # [n, d, d+1]
     result_list = [torch.cat((A_list_similar[i], b_list[i].unsqueeze(-1)), dim=-1) for i in range(nodes_count)]
+    return result_list
+
+def gen_random_list(nodes_count, d):
+    A_list = []
+    b_list = []
+    mu = 1e-2
+    L = 100
+    for i in range(nodes_count):
+        U = torch.from_numpy(ortho_group.rvs(dim=d))
+        U = U.float()
+        A = mu * torch.eye(d, dtype=torch.float32)
+        A[0][0] = L
+        A = torch.matmul(torch.matmul(U.T, A), U)
+        A_list.append(A)
+        b_list.append(torch.from_numpy(np.random.normal(0, 1, size=d)).float())
+    result_list = [torch.cat((A_list[i], b_list[i].unsqueeze(-1)), dim=-1) for i in range(nodes_count)]
     return result_list

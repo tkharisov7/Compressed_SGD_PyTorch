@@ -63,9 +63,9 @@ class SGDGen(Optimizer):
                     continue
 
                 param_state = self.state[p]
-
+                
                 d_p = p.grad.data
-
+                # print(d_p)
                 if self.error_feedback:
                     error_name = 'error_' + str(w_id)
                     if error_name not in param_state:
@@ -75,7 +75,6 @@ class SGDGen(Optimizer):
 
                     d_p = self.comp(loc_grad, w_id)
                     self.overall_information += d_p.element_size() * d_p.nelement() * self.comp.h
-                    # print(d_p)
                     # param_state[error_name] = loc_grad - d_p
                 else:
                     if self.comp is not None:
@@ -83,6 +82,7 @@ class SGDGen(Optimizer):
                         self.overall_information += d_p.element_size() * d_p.nelement() * self.comp.h
                     else:
                         d_p = d_p.mul(group['lr'])
+                # print(d_p)
 
                 if 'full_grad' not in param_state or self.grads_received == 1:
                     param_state['full_grad'] = torch.clone(d_p).detach()

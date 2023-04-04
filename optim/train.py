@@ -10,7 +10,7 @@ RUNS = 1
 
 
 def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_workers,
-                  val_loader, test_loader, n_workers, hpo=False):
+                  val_loader, test_loader, n_workers, hpo=False, log_every=1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     run = create_run()
@@ -25,7 +25,11 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
         running_loss = 0
         train_loader_iter = [iter(train_loader_workers[w]) for w in range(n_workers)]
         iter_steps = len(train_loader_workers[0])
-        for _ in tqdm(range(iter_steps)):
+        if e % log_every == 0:
+            gen = tqdm(range(iter_steps))
+        else:
+            gen = range(iter_steps)
+        for _ in gen:
             for w_id in range(n_workers):
                 data, labels = next(train_loader_iter[w_id])
                 data, labels = data.to(device), labels.to(device)
@@ -51,8 +55,9 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
 
         update_run(train_loss, test_loss, test_acc, run, optimizer.overall_information)
 
-        print("\nEpoch: {}/{}.. Training Loss: {:.5f}, Test Loss: {:.5f}, Test accuracy: {:.2f} "
-              .format(e + 1, epochs, train_loss, test_loss, test_acc), end='\r')
+        if e % log_every == 0:
+            print("\nEpoch: {}/{}.. Training Loss: {:.5f}, Test Loss: {:.5f}, Test accuracy: {:.2f} "
+                .format(e + 1, epochs, train_loss, test_loss, test_acc), end='\r')
 
     print('')
     if not hpo:
@@ -110,6 +115,7 @@ def run_workers(lr, exp, suffix=None, hpo=False):
     weight_decay = exp['weight_decay']
     compression = get_compression(**exp['compression'])
     master_compression = exp['master_compression']
+    log_every = exp['log_every']
 
     net = exp['net']
     model = net()
@@ -122,7 +128,7 @@ def run_workers(lr, exp, suffix=None, hpo=False):
                        comp=compression, momentum=momentum, weight_decay=weight_decay, master_comp=master_compression)
 
     val_loss = train_workers(suffix, model, optimizer, criterion, epochs, train_loader_workers,
-                             val_loader, test_loader, n_workers, hpo=hpo)
+                             val_loader, test_loader, n_workers, hpo=hpo, log_every=log_every)
     return val_loss
 
 
