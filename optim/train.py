@@ -38,15 +38,20 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
 
         train_loss = running_loss/(iter_steps*n_workers)
 
-        val_loss, _ = accuracy_and_loss(model, val_loader, criterion, device)
+        if len(val_loader) > 0:
+            val_loss, _ = accuracy_and_loss(model, val_loader, criterion, device)
 
-        if val_loss < best_val_loss:
-            test_loss, test_acc = accuracy_and_loss(model, test_loader, criterion, device)
-            best_val_loss = val_loss
+            if val_loss < best_val_loss:
+                test_loss, test_acc = accuracy_and_loss(model, test_loader, criterion, device)
+                best_val_loss = val_loss
+        else:
+            val_loss = 0
+            test_loss = 0
+            test_acc = 0
 
         update_run(train_loss, test_loss, test_acc, run)
 
-        print("Epoch: {}/{}.. Training Loss: {:.5f}, Test Loss: {:.5f}, Test accuracy: {:.2f} "
+        print("\nEpoch: {}/{}.. Training Loss: {:.5f}, Test Loss: {:.5f}, Test accuracy: {:.2f} "
               .format(e + 1, epochs, train_loss, test_loss, test_acc), end='\r')
 
     print('')

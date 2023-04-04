@@ -1,5 +1,6 @@
 from torch import nn
 import torch.nn.functional as F
+import torch
 
 import math
 
@@ -262,16 +263,25 @@ class Quadratic(nn.Module):
     """
     Quadtatic optimization problem
     """
-    def __init__(self, d):
-        self.x = torch.zeros(d)
-        self.x[0] = torch.sqrt(d)
-
+    def __init__(self, d=100):
+        super(Quadratic, self).__init__()
+        copy = torch.zeros(d)
+        copy[0] = math.sqrt(d)
+        self.x = nn.Parameter(copy)
+        
     def forward(self, A_b):
-        A = A_b[:, :-1]
-        b = A_b[:, -1]
-        return 1/2 * (self.x).T @ A @ self.x - b.T @ (self.x)
+        A = A_b.squeeze(0)[:, :-1]
+        # reshape A from [1, 100, ]
+        # print(A.shape)
+        b = A_b.squeeze(0)[:, -1]
+        # print(b.shape)
+        # print(self.x.shape)
+        result = torch.tensor(1/2) * ((self.x).T @ A @ self.x) - b.T @ (self.x)
+        #print(float(result))
+        #return torch.tensor(float(result)).requires_grad_(True)
+        return result.reshape([1])
 
-def quadratic_model(d):
+def quadratic_model(d=100):
     """
     Simple quadratic optimisation problem
     f(x) = 1/2 x^T A x - b^T x

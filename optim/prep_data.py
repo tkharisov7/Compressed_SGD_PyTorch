@@ -2,6 +2,12 @@ import numpy as np
 from torchvision import datasets
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Subset
+import torch
+import random
+from scipy.sparse import diags
+from numpy import linalg
+from scipy.stats import ortho_group
+import math
 
 
 def create_loaders(dataset_name, n_workers, batch_size, seed=42, val_ratio=0.1, common_ratio=0.0):
@@ -81,7 +87,9 @@ def load_data(dataset_name, n_workers=None):
         d = int(strs[1])
         noise_scale = float(strs[2])
         regularizer = float(strs[3])
-        train_data = gen_similar_list_article(n_workers, d, noise_scale, regularizer)
+        train_data = zip(gen_similar_list_article(n_workers, d, noise_scale, regularizer), [torch.tensor(0) for _ in range(n_workers)])
+        train_data = list(train_data)
+        test_data = torch.zeros(1, d, d+1)
     else:
         raise ValueError(dataset_name + ' is not known.')
 
@@ -118,8 +126,9 @@ def gen_similar_list_article (nodes_count, d, noise_scale, regularizer):
     x_0 = torch.zeros(d)
     x_0[0] = math.sqrt(d)
 
-    A_l = torch.tensor(A_list_similar)
-    b_l = torch.tensor(b_list)
-    concat_res = torch.cat((A_l, b_l.unsqueeze(-1)), dim=-1)
+    # A_l = torch.stack(A_list_similar)
+    # b_l = torch.stack(b_list)
+    # concat_res = torch.cat((A_l, b_l.unsqueeze(-1)), dim=-1)
     # [n, d, d+1]
-    return concat_res
+    result_list = [torch.cat((A_list_similar[i], b_list[i].unsqueeze(-1)), dim=-1) for i in range(nodes_count)]
+    return result_list

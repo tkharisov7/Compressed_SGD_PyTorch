@@ -5,9 +5,14 @@ import random
 import torch
 from pickle import load, dump
 
-SAVED_RUNS_PATH = '/kaggle/working/saved_data/'
-EXP_PATH = '/kaggle/working/exps_setup/'
+SAVED_RUNS_PATH = './saved_data/'
+EXP_PATH = './exps_setup/'
 
+def set_working_directory(name):
+    global SAVED_RUNS_PATH
+    global EXP_PATH
+    SAVED_RUNS_PATH = name + '/saved_data/'
+    EXP_PATH = name + '/exps_setup/'
 
 def save_run(suffix, run):
     if not os.path.isdir(SAVED_RUNS_PATH):
