@@ -21,7 +21,7 @@ def change_plot_path(name):
 
 
 def plot(exps, kind, suffix=None, log_scale=True, legend=None, file=None,
-         x_label='epochs', y_label=None, title=None, plot_info=False):
+         x_label='epochs', y_label=None, title=None, plot_info=False, y_lim=None):
     fig, ax = plt.subplots()
 
     for exp, lab in zip(exps, legend):
@@ -35,6 +35,8 @@ def plot(exps, kind, suffix=None, log_scale=True, legend=None, file=None,
         ax.set_yscale('log')
     #if legend is not None:
     #    ax.legend(legend)
+    if y_lim is not None:
+        ax.set_ylim(y_lim)
     plt.legend()
     if title is not None:
         plt.title(title)
