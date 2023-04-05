@@ -12,6 +12,7 @@ mpl.rcParams['legend.fontsize'] = 'x-large'
 mpl.rcParams['xtick.labelsize'] = 'x-large'
 mpl.rcParams['ytick.labelsize'] = 'x-large'
 mpl.rcParams['axes.labelsize'] = 'x-large'
+mpl.rcParams['lines.linestyle'] = '--'
 
 PLOT_PATH = './plots/'
 

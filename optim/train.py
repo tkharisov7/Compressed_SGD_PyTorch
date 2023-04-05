@@ -60,6 +60,7 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
                 count_less_than_threshold = 0
             if count_less_than_threshold == COUNT_THRESHOLD:
                 best_train_count = e + 1
+                break
 
 
         update_run(train_loss, test_loss, test_acc, run, optimizer.overall_information)
