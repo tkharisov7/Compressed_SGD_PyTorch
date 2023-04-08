@@ -75,7 +75,7 @@ class SGDGen(Optimizer):
 
                     d_p = self.comp(loc_grad, w_id)
                     self.overall_information += d_p.element_size() * d_p.nelement() * self.comp.h
-                    # param_state[error_name] = loc_grad - d_p
+                    param_state[error_name] = loc_grad - d_p
                 else:
                     if self.comp is not None:
                         d_p = self.comp(d_p, w_id).mul(group['lr'])
