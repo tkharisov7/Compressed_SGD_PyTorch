@@ -45,16 +45,17 @@ def create_run():
            'test_loss': [],
            'test_acc': [], 
            'information': [],
+            'error_ratio': []
            }
     return run
 
 
-def update_run(train_loss, test_loss, test_acc, run, information):
+def update_run(train_loss, test_loss, test_acc, run, information, error_ratio):
     run['train_loss'].append(train_loss)
     run['test_loss'].append(test_loss)
     run['test_acc'].append(test_acc)
     run['information'].append(information)
-
+    run['error_ratio'].append(error_ratio)
 
 def save_exp(exp):
     if not os.path.isdir(EXP_PATH):
@@ -74,7 +75,7 @@ def load_exp(exp_name):
 
 def create_exp(name, dataset, net, n_workers, epochs, seed, batch_size, lrs, compression, error_feedback, criterion,
                master_compression=None, momentum=0, weight_decay=0, val_ratio=0.1, common_ratio=0.0, log_every=1,
-               threshold=None):
+               threshold=None, ef_21=False):
     exp = {
         'name': name,
         'dataset_name': dataset,
@@ -95,7 +96,8 @@ def create_exp(name, dataset, net, n_workers, epochs, seed, batch_size, lrs, com
         'common_ratio': common_ratio,
         'log_every': log_every,
         'threshold': threshold,
-            }
+        'ef_21': ef_21,
+        }
     return exp
 
 

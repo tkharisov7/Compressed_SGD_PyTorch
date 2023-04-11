@@ -63,7 +63,7 @@ def train_workers(suffix, model, optimizer, criterion, epochs, train_loader_work
                 break
 
 
-        update_run(train_loss, test_loss, test_acc, run, optimizer.overall_information)
+        update_run(train_loss, test_loss, test_acc, run, optimizer.overall_information, optimizer.error_ratio)
 
         if (e + 1) % log_every == 0:
             print("\nEpoch: {}/{}.. Training Loss: {:.5f}, Test Loss: {:.5f}, Test accuracy: {:.2f} "
@@ -130,6 +130,7 @@ def run_workers(lr, exp, suffix=None, hpo=False):
     master_compression = exp['master_compression']
     log_every = exp['log_every']
     threshold = exp['threshold']
+    ef_21 = exp['ef_21']
 
     net = exp['net']
     model = net()
@@ -139,7 +140,8 @@ def run_workers(lr, exp, suffix=None, hpo=False):
                                                                    common_ratio=exp['common_ratio'])
 
     optimizer = SGDGen(model.parameters(), lr=lr, n_workers=n_workers, error_feedback=error_feedback,
-                       comp=compression, momentum=momentum, weight_decay=weight_decay, master_comp=master_compression)
+                       comp=compression, momentum=momentum, weight_decay=weight_decay, master_comp=master_compression, 
+                       ef_21=ef_21)
 
     val_loss = train_workers(suffix, model, optimizer, criterion, epochs, train_loader_workers,
                              val_loader, test_loader, n_workers, hpo=hpo, log_every=log_every, 

@@ -27,10 +27,10 @@ def plot(exps, kind, suffix=None, log_scale=True, legend=None, file=None,
 
     for exp, lab in zip(exps, legend):
         runs = read_all_runs(exp, suffix=suffix)
-        if not plot_info:
-            plot_mean_std(ax, runs, kind, lab)
-        else:
+        if plot_info:
             plot_information(ax, runs, kind, lab)
+        else:
+            plot_mean_std(ax, runs, kind, lab)
 
     if log_scale:
         ax.set_yscale('log')
