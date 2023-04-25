@@ -116,6 +116,33 @@ def tune_step_size(exp):
             best_val_loss = val_loss
     return best_lr
 
+def tune_step_size_plus(exp, num=15):
+    best_val_loss = np.inf
+    best_lr = 0
+    best_pos = 0
+
+    seed = exp['seed']
+    seed_everything(seed)
+    hpo = True
+
+    for i, lr in enumerate(exp['lrs']):
+        print('Learning rate {:2.4f}:'.format(lr))
+        val_loss = run_workers(lr, exp, hpo=hpo)
+
+        if val_loss < best_val_loss:
+            best_lr = lr
+            best_val_loss = val_loss
+            best_pos = i
+    lrs_linear = np.linspace(exp['lrs'][max(0, best_pos - 1)], exp['lrs'][min(len(exp['lrs']) - 1, best_pos + 1)], num=num)
+    for i, lr in enumerate(lrs_linear):
+        print('Learning rate {:2.4f}:'.format(lr))
+        val_loss = run_workers(lr, exp, hpo=hpo)
+
+        if val_loss < best_val_loss:
+            best_lr = lr
+            best_val_loss = val_loss
+    return best_lr
+
 
 def run_workers(lr, exp, suffix=None, hpo=False):
     dataset_name = exp['dataset_name']
